@@ -1,26 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "gra.h"
+#include "valoresVertices.h"
 
-#define TAM 80
-
-typedef struct Vertice Vertice;
-
-
-struct Vertice { //vertice
-/* informacao associada a cada noh
- */
-    int discos[4];
-};
-struct arc {
-    int adj;
-/* informacao associada a cada arco */
-};
-
-typedef struct Graph Graph;
-struct Graph {
-    Vertice *vertices;
-    int **arestas;
-};
+#define TAM 81
+#define INF 999999
 
 
 Graph *iniciaGrafo(int n){
@@ -41,6 +25,7 @@ void imprimirGrafo(Graph *G, int n){
     printf("Vertices: \n"
     "  "
     );
+    // n = 19;
     for(int i = 0; i < n; i++){
         printf(" %d", i);
     }
@@ -55,19 +40,15 @@ void imprimirGrafo(Graph *G, int n){
     printf("\n");
 }
 
-void inserirValorVertice(Graph *G, int linha, int Disco1maior, int Disco2medioMa, int Disco3medioMe, int Disco4menor, int aresta1, int aresta2, int aresta3, int qtdArestas){
-    G->vertices[linha].discos[0] = Disco1maior;
-    G->vertices[linha].discos[1] = Disco2medioMa;
-    G->vertices[linha].discos[2] = Disco3medioMe;
-    G->vertices[linha].discos[3] = Disco4menor;
 
-    if(qtdArestas == 2){
-        G->arestas[linha][aresta1] = 1;
-        G->arestas[linha][aresta2] = 1;
-    }else if(qtdArestas == 3){
-        G->arestas[linha][aresta1] = 1;
-        G->arestas[linha][aresta2] = 1;
-        G->arestas[linha][aresta3] = 1;
+void inserirArestas(Graph *G){
+    FILE *arestas; arestas = fopen("arestas.txt", "r");
+    int verticeAtual = 0, aresta1, aresta2, aresta3;
+
+    while (fscanf(arestas, "%d %d %d %d", &verticeAtual, &aresta1, &aresta2, &aresta3) != EOF){
+        G->arestas[verticeAtual][aresta1] = 1;
+        G->arestas[verticeAtual][aresta2] = 1;
+        G->arestas[verticeAtual][aresta3] = 1;    
     }
 }
 
@@ -75,20 +56,67 @@ void imprimirConteudoVertice(Graph *G, int linha){
     printf("Vertice %d: %d %d %d %d\n", linha, G->vertices[linha].discos[0], G->vertices[linha].discos[1], G->vertices[linha].discos[2], G->vertices[linha].discos[3]);
 }
 
-int main(){
-    Graph *G;
-    int linha,  Disco1maior,  Disco2medioMa,  Disco3medioMe,  Disco4menor,  aresta1,  aresta2,  aresta3,  qtdArestas;
+void dijkstra(int **grafo, int vertices, int origem, int destino) {
+    int distanciaMinima, proximoVertice;
+    int *distancia, *verticevisitado, *verticeAnterior;
+    
+    distancia = (int*) malloc(vertices * sizeof(int));
+    verticevisitado = (int*) malloc(vertices * sizeof(int));
+    verticeAnterior = (int*) malloc(vertices * sizeof(int));
 
-    G = iniciaGrafo(TAM);
+    // Inicializa o vetor que guarda a menor distância, os vértices visitados e o vértice anterior 
+    for (int i = 0; i < vertices; i++) {
+        distancia[i] = INF;
+        verticevisitado[i] = 0;
+        verticeAnterior[i] = -1;
+    }
+    
+    // A distância do nó de origem para ele mesmo é zero
+    distancia[origem] = 0;
+    
+    // Encontra o caminho mais curto para todos os vértices
+    for (int qtdRelaxamentos = 0; qtdRelaxamentos < vertices - 1; qtdRelaxamentos++) {
+        distanciaMinima = INF;
+        // Encontra o próximo vértice não visitado com a menor distância
+        for (int i = 0; i < vertices; i++) {
+            if (!verticevisitado[i] && distancia[i] <= distanciaMinima) {
+                distanciaMinima = distancia[i];
+                proximoVertice = i;
+            }
+        }
+        // Marca o próximo vértice como visitado
+        verticevisitado[proximoVertice] = 1;
+        // Atualiza as distâncias dos vértices adjacentes não visitados
+        for (int i = 0; i < vertices; i++) {
+            if (!verticevisitado[i] && grafo[proximoVertice][i] &&
+                distancia[proximoVertice] + grafo[proximoVertice][i] < distancia[i]) {
+                distancia[i] = distancia[proximoVertice] + grafo[proximoVertice][i];
+                verticeAnterior[i] = proximoVertice;
+            }
+        }
+    }
 
-    inserirValorVertice(G, 0, 1, 1, 1, 1, 1, 2, 0, 2); // vertice 0
-    inserirValorVertice(G, linha = 1, Disco1maior = 1, Disco2medioMa = 1, Disco3medioMe = 1, Disco4menor = 2, aresta1 = 0, aresta2 = 2, aresta3 = 3, qtdArestas = 3); // vertice 1
-    inserirValorVertice(G, linha = 2, Disco1maior = 1, Disco2medioMa = 1, Disco3medioMe = 1, Disco4menor = 3, aresta1 = 0, aresta2 = 1, aresta3 = 4, qtdArestas = 3); // vertice 2
-    imprimirGrafo(G, TAM);
-    imprimirConteudoVertice(G, 0);
-    imprimirConteudoVertice(G, 1);
-    imprimirConteudoVertice(G, 2);
-    return 0;
+    imprimeMenorCaminhoDijkstraBellman(vertices,destino,verticeAnterior,distancia);
+    free(distancia);
+    free(verticevisitado);
+    free(verticeAnterior);
 }
 
-
+void imprimeMenorCaminhoDijkstraBellman(int vertices, int destino, int verticeAnterior[], int distancia[]){
+    // Mostrar o caminho mais curto para o vértice de destino como também a distância
+    printf("\nCaminho mais curto: ");
+    int comprimentocaminho = 0;
+    int *caminhovertices; caminhovertices = (int*)malloc(vertices * sizeof(int));
+    int verticeatual = destino;
+    while (verticeatual != -1) {
+        caminhovertices[comprimentocaminho++] = verticeatual;
+        verticeatual = verticeAnterior[verticeatual];
+    }
+    for (int i = comprimentocaminho - 1; i >= 0; i--) {
+        printf("%d ", caminhovertices[i]);
+        if (i > 0)
+            printf("-> ");
+    }
+    printf("\nDistancia: %d\n", distancia[destino]);
+    free(caminhovertices);
+}
