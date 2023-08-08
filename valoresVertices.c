@@ -2,82 +2,16 @@
 #include "gra.h"
 #include "valoresVertices.h"
 
-int verificar_rosa(int pino_2[], int pino_3[], int i){
-    int flag = 1;
+int verificar_pino1(int pino_2[], int pino_3[], int i){
+     int flag = 1;
 
     for (int j = 0; j < 27 && flag != 3 && flag != 2; j++){
-        if (i == pino_3[j]){
+        if (i == pino_3[j])
             flag = 3;
-        }
-        else if (i == pino_2[j]){
+        else if (i == pino_2[j])
             flag = 2;
-        }
     }
     return flag;
-    // for (int j = 0; j < 27; j++){
-    //     if (i == pino_3[j]){
-    //         return 3;
-    //     }
-    //     else if (i == pino_2[j]){
-    //         return 2;
-    //     }
-    // }
-    // return 1;
-}
-
-int verificar_verde(int pino_2[], int pino_3[], int i){
-    int flag = 1;
-
-    for (int j = 0; j < 27 && flag != 3 && flag != 2; j++){
-        if (i == pino_3[j]){
-            flag = 3;
-        }
-        else if (i == pino_2[j]){
-            flag = 2;
-        }
-    }
-    return flag;
-    // for (int j = 0; j < 27; j++){
-    //     if (i == pino_3[j]){
-    //         return 3;
-    //     }
-    //     else if (i == pino_2[j]){
-    //         return 2;
-    //     }
-    // }
-    // return 1;
-}
-
-int verificar_amarelo(int pino_2[], int pino_3[], int i){
-    int cont = 0, pino = 1;
-    
-    while (cont < 27 && pino != 2 && pino != 3){
-        if (i == pino_3[cont]){
-            pino = 3;
-        }
-        else if (i == pino_2[cont]){
-            pino = 2;
-        }
-        cont++;
-    }
-
-    return pino;
-}
-
-int verificar_vermelho(int pino_2[], int pino_3[], int i){
-    int cont = 0, pino = 1;
-    
-    while (cont < 27 && pino != 2 && pino != 3){
-        if (i == pino_3[cont]){
-            pino = 3;
-        }
-        else if (i == pino_2[cont]){
-            pino = 2;
-        }
-        cont++;
-    }
-
-    return pino;
 }
 
 void printPinos(int i, int vermelho, int amarelo, int rosa, int verde){
@@ -91,147 +25,59 @@ void setValorVertice(Graph *G, int i, int vermelho, int amarelo, int rosa, int v
     G->vertices[i].discos[3] = rosa;
 }
 
-void verificar_pinos(Graph *G, int amarelo_pino_2[], int amarelo_pino_3[], int verde_pino_2[], int verde_pino_3[], int rosa_pino_2[], int rosa_pino_3[], int i, int vermelho){
-    int amarelo = 1, verde = 1, rosa = 1;
+
+
+void chamadaRecursiva(Graph *G, int vermelho, int verde, int amarelo, int rosa, int amarelo_pino_2[], int amarelo_pino_3[], int verde_pino_2[], int verde_pino_3[], int rosa_pino_2[], int rosa_pino_3[], int i, int cont){
+
+    if(cont == 1){
+        verificar_pinos2(G, vermelho, amarelo, verde, rosa, verde_pino_2, verde_pino_3, amarelo_pino_2, amarelo_pino_3, rosa_pino_2, rosa_pino_3, i, cont);
+    }else if(cont == 2){
+        verificar_pinos2(G, vermelho, amarelo, verde, rosa, rosa_pino_2, rosa_pino_3, verde_pino_2, verde_pino_3, amarelo_pino_2, amarelo_pino_3, i, cont);
+    }else 
+        setValorVertice(G, i, vermelho, amarelo, rosa, verde);
+
+}
+
+void verificar_pinos2(Graph *G, int vermelho, int amarelo, int verde, int rosa, int amarelo_pino_2[], int amarelo_pino_3[], int verde_pino_2[], int verde_pino_3[], int rosa_pino_2[], int rosa_pino_3[], int i, int cont){
     
-    amarelo = verificar_amarelo(amarelo_pino_2, amarelo_pino_3, i);
-    verde = verificar_verde(verde_pino_2, verde_pino_3, i);
-    rosa = verificar_rosa(rosa_pino_2, rosa_pino_3, i);
+    if(cont < 3){
+        int pino;
+        pino = verificar_pino1(amarelo_pino_2, amarelo_pino_3, i);
+        
+        if (i >= 26 && pino == 3){
+            if(cont == 0)
+                amarelo = pino;
+            else if(cont == 1)
+                verde = pino;
+            else
+                rosa = pino;
+            
+            cont += 1;
+            chamadaRecursiva(G, vermelho, verde, amarelo, rosa, amarelo_pino_2, amarelo_pino_3, verde_pino_2, verde_pino_3, rosa_pino_2, rosa_pino_3, i, cont);
+        }
 
-     if (amarelo == 3){ // amarelo = 3
+        else if (i >= 26 && pino == 2){ // vermelho = 2
+            if(cont == 0)
+                amarelo = pino;
+            else if(cont == 1)
+                verde = pino;
+            else
+                rosa = pino;
 
-        if(verde == 3){
-            if (rosa == 3){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else if(rosa == 2){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else{
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
+            cont += 1;
+            chamadaRecursiva(G, vermelho, verde, amarelo, rosa, amarelo_pino_2, amarelo_pino_3, verde_pino_2, verde_pino_3, rosa_pino_2, rosa_pino_3, i, cont);
         }
-        else if(verde == 2){
-            if (rosa == 3){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else if(rosa == 2){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else{
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-        } 
-        else{   
-            if (rosa == 3){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else if(rosa == 2){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else{
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-        }
-    }
 
+        else{
+            if(cont == 0)
+                amarelo = pino;
+            else if(cont == 1)
+                verde = pino;
+            else
+                rosa = pino;
 
-    else if (amarelo == 2){
-        if(verde == 3){
-            if (rosa == 3){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else if(rosa == 2){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else{
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-        }
-        else if(verde == 2){
-            if (rosa == 3){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else if(rosa == 2){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else{
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-        } 
-        else
-        {   
-            if (rosa == 3){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else if(rosa == 2){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else{
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-        }
-    }
-    else{ // amarelo = 1
-        if(verde == 3){
-            if (rosa == 3){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else if(rosa == 2){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else{
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-        }
-        else if(verde == 2){
-            if (rosa == 3){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else if(rosa == 2){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else{
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-        } 
-        else{   
-            if (rosa == 3){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else if(rosa == 2){
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
-            else{
-                printPinos(i, vermelho, amarelo, rosa, verde);
-                setValorVertice(G, i, vermelho, amarelo, rosa, verde);
-            }
+            cont += 1;
+            chamadaRecursiva(G, vermelho, verde, amarelo, rosa, amarelo_pino_2, amarelo_pino_3, verde_pino_2, verde_pino_3, rosa_pino_2, rosa_pino_3, i, cont);
         }
     }
 }
@@ -251,20 +97,18 @@ void inserirValoresVertices(Graph *G){
 
     for (int i = 0; i <= 80; i++){
         int vermelho;
-        vermelho = verificar_vermelho(vermelho_pino_2, vermelho_pino_3, i);
+        vermelho = verificar_pino1(vermelho_pino_2, vermelho_pino_3, i);
     
         if (i >= 26 && vermelho == 3){
-            vermelho = 3;
-            verificar_pinos(G, amarelo_pino_2, amarelo_pino_3, verde_pino_2, verde_pino_3, rosa_pino_2, rosa_pino_3, i, vermelho);
+            verificar_pinos2(G, vermelho, 0, 0, 0, amarelo_pino_2, amarelo_pino_3, verde_pino_2, verde_pino_3, rosa_pino_2, rosa_pino_3, i, 0);
         }
 
         else if (i >= 26 && vermelho == 2){ // vermelho = 2
-            vermelho = 2;
-            verificar_pinos(G, amarelo_pino_2, amarelo_pino_3, verde_pino_2, verde_pino_3, rosa_pino_2, rosa_pino_3, i, vermelho);
+            verificar_pinos2(G, vermelho, 0, 0, 0, amarelo_pino_2, amarelo_pino_3, verde_pino_2, verde_pino_3, rosa_pino_2, rosa_pino_3, i, 0);
         }
 
         else{
-            verificar_pinos(G, amarelo_pino_2, amarelo_pino_3, verde_pino_2, verde_pino_3, rosa_pino_2, rosa_pino_3, i, vermelho);
+            verificar_pinos2(G, vermelho, 0, 0, 0, amarelo_pino_2, amarelo_pino_3, verde_pino_2, verde_pino_3, rosa_pino_2, rosa_pino_3, i, 0);
         }
     }
 }
