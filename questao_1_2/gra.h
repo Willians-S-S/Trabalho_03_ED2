@@ -1,15 +1,9 @@
 typedef struct Vertice Vertice;
-
-
 struct Vertice { //vertice
 /* informacao associada a cada noh
  */
     int discos[4];
 };
-// struct arc {
-//     int adj;
-// /* informacao associada a cada arco */
-// };
 
 typedef struct Graph Graph;
 struct Graph {

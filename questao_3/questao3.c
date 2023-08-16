@@ -1,6 +1,78 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+// #include <math.h>
+#include <time.h>
+
+typedef struct Vertice Vertice;
+struct Vertice { //vertice
+/* informacao associada a cada nó*/
+    int ponto; // tipo ponto 0, ponto 1...
+};
+
+typedef struct Graph Graph;
+struct Graph {
+    Vertice *vertices;
+    double **arestas;
+};
+
+Graph *iniciaGrafo(int n){
+    // n é o numero de vertices ou configuracoes possiveis
+    Graph *G;
+
+    G = (Graph *) malloc(sizeof(Graph));
+    
+    // Alocação de memoria para o vetor de vertices
+    G->vertices = (Vertice *) malloc(n * sizeof(Vertice));
+    
+    // Alocação de memoria para a matriz de arestas
+    G->arestas = (double **) malloc(n * sizeof(double *));
+    for(int i = 0; i < n; i++){
+        G->arestas[i] = (double *) calloc(n, sizeof(double));
+    }
+
+    return G;
+}
+
+void inserirVerticeEarestasAleatorio(Graph *G, int Tamanho){
+    int qtdLigacoesArestas = 0, verticeIraLigar;
+    double valorDaAresta;
+
+    for(int i = 0; i < Tamanho; i++){
+
+        G->vertices[i].ponto = i; // atribui o ponto se é 0, 1, 2...
+
+        qtdLigacoesArestas = rand() % 5 + 1;; // a quantidade maxima de ligações de vertice vai ser 5 o minimo vai ser 1 
+        for(int j = 0; j < qtdLigacoesArestas; j++){
+            verticeIraLigar = rand() % Tamanho; // numero do outro vertice da matriz adjacente
+    
+            if (i != verticeIraLigar) {
+                G->arestas[i][verticeIraLigar] = (double)rand() / RAND_MAX; // valor da ligação // atribuição do valor caso não seja igual ao mesmo vertice
+            }
+        }
+    }
+}
+
+void imprimirConteudoVertice(Graph *G, int linha){
+    printf("%d\n", G->vertices[linha].ponto);
+}
+
+void imprimirMatrizAdjacente(Graph *G, int n){
+    printf("Vertices: \n"
+    "  "
+    );
+    for(int i = 0; i < n; i++){
+        printf(" %d", i);
+    }
+    printf("\n\n");
+    for(int i = 0; i < n; i++){
+        printf("%d  ", i);
+        for(int j = 0; j < n; j++){
+            printf("%.2lf ", G->arestas[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
 
 void imprimeCaminhoConfiavel(int vertices, int destino, int verticeAnterior[], double confiabilidade[]) {
     // Mostrar o caminho mais confiável para o vértice de destino, bem como a confiabilidade total
@@ -76,52 +148,101 @@ void dijkstra(double **grafo, int vertices, int origem, int destino) {
     free(verticeAnterior);
 }
 
+void liberarGrafo(Graph **G, int qtdVertice){
+    for (int i = 0; i < qtdVertice; i++){
+        free((*G)->arestas[i]);
+        (*G)->arestas[i] = NULL;
+    }
+    free((*G)->vertices);
+    (*G)->vertices = NULL;
+
+    free(*G);
+    *G = NULL;
+}
+
 int main() {
-    int vertices = 4; // Número total de vértices no grafo
-    int origem = 0;   // Vértice de origem para o cálculo do caminho mais confiável
-    int destino = 3;  // Vértice de destino para o cálculo do caminho mais confiável
+   
+    srand(time(NULL));
 
-    // Criação e inicialização da matriz de adjacência (representando probabilidades de confiabilidade)
-    double **adjMatrix = (double **)malloc(vertices * sizeof(double *));
+    Graph *G; G = NULL;
+    int op = -1, qtdVertice, op2, origem, destino, vertice;
 
-    for (int i = 0; i < vertices; i++) {
-        adjMatrix[i] = (double *)malloc(vertices * sizeof(double));
-        for (int j = 0; j < vertices; j++) {
-            adjMatrix[i][j] = 0.0; // Inicialize com as probabilidades de confiabilidade apropriadas
+
+    while (op != 0){
+        printf("1 - Criar Grafo\n"
+            "2 - Encontar caminho mais confiavel\n"
+            "3 - Liberar Grafo\n"
+            "4 - Imprimir Matriz Adjacente\n"
+            "Digite a opcao: ");
+        scanf("%d", &op);
+        switch (op){
+        case 0:
+            printf("saindo...\n");
+            break;
+        case 1:
+            if(G == NULL){
+                printf("Digite a quantidade de vertice: ");
+                scanf("%d", &qtdVertice);
+                G = iniciaGrafo(qtdVertice);
+
+                printf("Deseja preencher o grafo de forma aletoria ou manual? 1 - Aleatorio, 2 - manual: ");
+                scanf("%d", &op2);
+                if(op2 == 1)
+                    inserirVerticeEarestasAleatorio(G, qtdVertice);
+                else if(op2 == 2){
+                    for (int i = 0; i < qtdVertice; i++){
+                        printf("Digite o valor do vertice: ");
+                        scanf("%d", &G->vertices[i].ponto);
+                         
+                        for (int j = 0; j < qtdVertice; j++){
+                            if (i != j) {
+                                scanf("%lf", &G->arestas[i][j]);
+                            }
+                        }
+                    }
+                }else
+                    printf("Opcao invalida\n");
+            }
+            else
+                printf("Libere o grafo.\n");
+            break;
+        case 2:
+            if (G != NULL){
+                printf("Digite a quantidade de vertice: ");
+                scanf("%d", &qtdVertice);
+                printf("Digite a origem: ");
+                scanf("%d", &origem);
+                printf("Digite a destino: ");
+                scanf("%d", &destino);
+
+                dijkstra(G->arestas, qtdVertice, origem, destino);
+                
+            }else
+                printf("Preencha o grafo.\n");
+            break;
+        case 3:
+            if(G != NULL){
+                printf("Digite a quantidade de vertices: ");
+                scanf("%d", &qtdVertice);
+                liberarGrafo(&G, qtdVertice);
+            }else
+                printf("O grafo já esta vazio\n");
+            break;
+
+        case 4:
+            
+            if(G != NULL){   
+                printf("Digite a quantidade de vertices: ");
+                scanf("%d", &qtdVertice);
+                imprimirMatrizAdjacente(G, qtdVertice);
+            }else
+                printf("O grafo já esta vazio\n");
+            break;
+        default:
+            printf("Opção invalida.\n");
+            break;
         }
     }
-
-    // Preencha a matriz de adjacência com as probabilidades de confiabilidade entre os vértices
-    adjMatrix[0][1] = 0.2; // Exemplo: Probabilidade de confiabilidade da aresta A -> B
-    adjMatrix[0][2] = 0.2; // Exemplo: Probabilidade de confiabilidade da aresta A -> B
-    
-    // adjMatrix[1][2] = 0.5; // Exemplo: Probabilidade de confiabilidade da aresta A -> B
-    adjMatrix[1][3] = 0.5; // Exemplo: Probabilidade de confiabilidade da aresta A -> B
-    
-    adjMatrix[2][1] = 0.9; // Exemplo: Probabilidade de confiabilidade da aresta A -> B
-    adjMatrix[2][3] = 0.3; // Exemplo: Probabilidade de confiabilidade da aresta A -> B
-    
-    
-    for(int i = 0; i < vertices; i++){
-        printf("  %d ", i);
-    }
-    printf("\n");
-    for(int i = 0; i < vertices; i++){
-        printf("%d ", i);
-        for(int j = 0; j < vertices; j++){
-            printf("%.1lf ", adjMatrix[i][j]);
-        }
-        printf("\n");
-    }
-
-    // Chama a função dijkstra para encontrar o caminho mais confiável entre os vértices de origem e destino
-    dijkstra(adjMatrix, vertices, origem, destino);
-
-    // Libera a memória alocada para a matriz de adjacência
-    for (int i = 0; i < vertices; i++) {
-        free(adjMatrix[i]);
-    }
-    free(adjMatrix);
 
     return 0;
 }
