@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "gra.h"
-// #include "valoresVertices.h"
 
 #define TAM 81
 #define INF 999999
-
 
 Graph *iniciaGrafo(int n){
     // n é o numero de vertices ou configuracoes possiveis
@@ -25,7 +23,7 @@ Graph *iniciaGrafo(int n){
     return G;
 }
 
-void imprimirGrafo(Graph *G, int n){
+void imprimirMatrizAdjacente(Graph *G, int n){
     printf("Vertices: \n"
     "  "
     );
@@ -43,30 +41,24 @@ void imprimirGrafo(Graph *G, int n){
     printf("\n");
 }
 
-
-void inserirArestas(Graph *G){
-    FILE *arestas; arestas = fopen("arestas.txt", "r");
-    int verticeAtual = 0, aresta1, aresta2, aresta3;
-
-    // Inserir as arestas no grafo a partir do arquivo arestas.txt
-    while (fscanf(arestas, "%d %d %d %d", &verticeAtual, &aresta1, &aresta2, &aresta3) != EOF){
-        G->arestas[verticeAtual][aresta1] = 1;
-        G->arestas[verticeAtual][aresta2] = 1;
-        if(aresta3 != 9999)
-            G->arestas[verticeAtual][aresta3] = 1;    
-    }
-}
-
-void inserirValoresVertices(Graph *G){
-    FILE *valoresVertices; valoresVertices = fopen("valoresVertices.txt", "r");
-    int verticeAtual = 0, vermelho, amarelo, verde, rosa;
+void inserirVerticeEarestas(Graph *G){
+    FILE *verticesEarestas; verticesEarestas = fopen("verticesEarestas.txt", "r");
+    int verticeAtual = 0, vermelho, amarelo, verde, rosa, aresta1, aresta2, aresta3;
 
     // Inserir os valores dos vertices no grafo a partir do arquivo valoresVertices.txt
-    while (fscanf(valoresVertices, "%d %d %d %d %d", &verticeAtual, &vermelho, &amarelo, &verde, &rosa) != EOF){
+    while (fscanf(verticesEarestas, "%d %d %d %d %d %d %d %d", &verticeAtual, &vermelho, &amarelo, &verde, &rosa, &aresta1, &aresta2, &aresta3) != EOF){
+
+        //preenche os pinos dos vertices
         G->vertices[verticeAtual].discos[0] = vermelho;
         G->vertices[verticeAtual].discos[1] = amarelo;
         G->vertices[verticeAtual].discos[2] = verde;
         G->vertices[verticeAtual].discos[3] = rosa;
+
+        // marca a ligação das arestas na matriz adjacente
+        G->arestas[verticeAtual][aresta1] = 1;
+        G->arestas[verticeAtual][aresta2] = 1;
+        if(aresta3 != 9999)
+            G->arestas[verticeAtual][aresta3] = 1;
     }
 }
 

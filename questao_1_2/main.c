@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "gra.h"
-// #include "valoresVertices.h"
 
 #define TAM 81
 
@@ -112,8 +111,8 @@ int main(){
 
     G = iniciaGrafo(TAM);
     
-    inserirArestas(G);
-    inserirValoresVertices(G);
+    inserirVerticeEarestas(G);
+    // inserirValoresVertices(G);
 
     while (op != 0){
         printf("\n1 - imprimir valores de todos os vertices\n"
@@ -144,7 +143,7 @@ int main(){
                 printf("Indice de vertice não existe.\n");
             break;
         case 3:
-            imprimirGrafo(G, TAM); // imprimir arestas
+            imprimirMatrizAdjacente(G, TAM); // imprimir arestas
             break;
         case 4:
             cont = 0;

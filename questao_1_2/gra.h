@@ -18,9 +18,10 @@ struct Graph {
 };
 
 Graph *iniciaGrafo(int n);
-void imprimirGrafo(Graph *G, int n);
+void imprimirMatrizAdjacente(Graph *G, int n);
 void inserirArestas(Graph *G);
 void inserirValoresVertices(Graph *G);
+void inserirVerticeEarestas(Graph *G);
 
 void imprimirConteudoVertice(Graph *G, int linha);
 
