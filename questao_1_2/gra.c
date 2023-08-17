@@ -99,11 +99,15 @@ void dijkstra(int **grafo, int vertices, int origem, int destino) {
         verticevisitado[indiceVerticeAtual] = 1;
         // Atualiza as distâncias dos vértices adjacentes não visitados
         for (int i = 0; i < vertices; i++) {
-            if (!verticevisitado[i] && grafo[indiceVerticeAtual][i] &&
-                distancia[indiceVerticeAtual] + grafo[indiceVerticeAtual][i] < distancia[i]) {
+            if (!verticevisitado[i] && grafo[indiceVerticeAtual][i]) {
+                int dist = distancia[indiceVerticeAtual] + grafo[indiceVerticeAtual][i];
 
-                distancia[i] = distancia[indiceVerticeAtual] + grafo[indiceVerticeAtual][i];
-                verticeAnterior[i] = indiceVerticeAtual;
+                if(dist < distancia[i]){
+                    distancia[i] = distancia[indiceVerticeAtual] + grafo[indiceVerticeAtual][i];
+                    verticeAnterior[i] = indiceVerticeAtual;
+                }
+
+                
             }
         }
     }
@@ -119,11 +123,14 @@ void imprimeMenorCaminhoDijkstraBellman(int vertices, int destino, int verticeAn
     printf("\nCaminho mais curto: ");
     int comprimentocaminho = 0;
     int *caminhovertices; caminhovertices = (int*)malloc(vertices * sizeof(int));
+
     int verticeatual = destino;
+
     while (verticeatual != -1) {
         caminhovertices[comprimentocaminho++] = verticeatual;
         verticeatual = verticeAnterior[verticeatual];
     }
+    
     for (int i = comprimentocaminho - 1; i >= 0; i--) {
         printf("%d ", caminhovertices[i]);
         if (i > 0)

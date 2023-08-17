@@ -9,8 +9,8 @@ int main(){
     Graph *G;
     int op, vertice, opJogo, cont, vetorResposta[3], origem, destino; op = -1;
 
-    G = iniciaGrafo(TAM);
-    
+    G = iniciaGrafo(81);
+
     inserirVerticeEarestas(G);
 
     while (op != 0){
