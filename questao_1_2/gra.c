@@ -103,7 +103,7 @@ void dijkstra(int **grafo, int vertices, int origem, int destino) {
                 int dist = distancia[indiceVerticeAtual] + grafo[indiceVerticeAtual][i];
 
                 if(dist < distancia[i]){
-                    distancia[i] = distancia[indiceVerticeAtual] + grafo[indiceVerticeAtual][i];
+                    distancia[i] = dist;
                     verticeAnterior[i] = indiceVerticeAtual;
                 }
 
@@ -130,7 +130,7 @@ void imprimeMenorCaminhoDijkstraBellman(int vertices, int destino, int verticeAn
         caminhovertices[comprimentocaminho++] = verticeatual;
         verticeatual = verticeAnterior[verticeatual];
     }
-    
+
     for (int i = comprimentocaminho - 1; i >= 0; i--) {
         printf("%d ", caminhovertices[i]);
         if (i > 0)
