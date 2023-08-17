@@ -176,6 +176,11 @@ int main() {
         scanf("%d", &op);
         switch (op){
         case 0:
+            if(G != NULL){
+                printf("Para sair libere o grafo. Digite a quantidade de vertices: ");
+                scanf("%d", &qtdVertice);
+                liberarGrafo(&G, qtdVertice);
+            }
             printf("saindo...\n");
             break;
         case 1:
